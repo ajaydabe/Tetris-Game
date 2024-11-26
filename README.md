@@ -25,14 +25,14 @@ stage("Sonarqube Analysis "){
 
 Owasp block
 ```
-        stage('OWASP FS Scan') {
-            steps {
-                withEnv(['JAVA_OPTS=-Xmx6g']) {
-                    dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
-                    dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
-                }
-            }
+stage('OWASP FS Scan') {
+    steps {
+        withEnv(['JAVA_OPTS=-Xmx6g']) {
+          dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
+          dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
         }
+    }
+}
 ```
 
 # ARGO CD SETUP
@@ -40,33 +40,33 @@ Owasp block
 
 # Image updater stage
 ```
-    environment {
-        GIT_REPO_NAME = "Tetris-manifest"
-        GIT_USER_NAME = "ajaydabe"
+environment {
+    GIT_REPO_NAME = "Tetris-manifest"
+    GIT_USER_NAME = "ajaydabe"
+}
+stage('Checkout Code') {
+    steps {
+        git branch: 'version2', url: 'https://github.com/ajaydabe/tetris-deployment.git'
     }
-    stage('Checkout Code') {
-        steps {
-            git branch: 'version2', url: 'https://github.com/ajaydabe/tetris-deployment.git'
-        }
-    }
+}
 
-    stage('Update Deployment File') {
-        steps {
-            script {
-                withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
-                  // Determine the image name dynamically based on your versioning strategy
-                  NEW_IMAGE_NAME = "ajaydabe/tetris:latest"
+stage('Update Deployment File') {
+    steps {
+        script {
+            withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
+              // Determine the image name dynamically based on your versioning strategy
+              NEW_IMAGE_NAME = "ajaydabe/tetris:latest"
 
-                  // Replace the image name in the deployment.yaml file
-                  sh "sed -i 's|image: .*|image: $NEW_IMAGE_NAME|' deployment.yml"
+              // Replace the image name in the deployment.yaml file
+              sh "sed -i 's|image: .*|image: $NEW_IMAGE_NAME|' deployment.yml"
 
-                  // Git commands to stage, commit, and push the changes
-                  sh 'git add deployment.yml'
-                  sh "git commit -m 'Update deployment image to $NEW_IMAGE_NAME'"
-                  sh "git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:version2"
-                }
+              // Git commands to stage, commit, and push the changes
+              sh 'git add deployment.yml'
+              sh "git commit -m 'Update deployment image to $NEW_IMAGE_NAME'"
+              sh "git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:version2"
             }
-        }
-    }
+        }
+    }
+}
 
 ```
