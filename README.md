@@ -10,25 +10,27 @@ Tetris game built with React
 Use Sonarqube block 
 ```
 environment {
-        SCANNER_HOME=tool 'sonar-scanner'
-      }
+    SCANNER_HOME=tool 'sonar-scanner'
+}
 
 stage("Sonarqube Analysis "){
-            steps{
-                withSonarQubeEnv('sonar-server') {
-                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Amazon \
-                    -Dsonar.projectKey=Amazon '''
-                }
-            }
+    steps{
+        withSonarQubeEnv('sonar-server') {
+          sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Amazon \
+          -Dsonar.projectKey=Amazon '''
         }
+    }
+}
 ```        
 
 Owasp block
 ```
-stage('OWASP FS SCAN') {
+        stage('OWASP FS Scan') {
             steps {
-                dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
-                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+                withEnv(['JAVA_OPTS=-Xmx6g']) {
+                    dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
+                    dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+                }
             }
         }
 ```
@@ -40,11 +42,11 @@ https://archive.eksworkshop.com/intermediate/290_argocd/install/
 ```
  environment {
     GIT_REPO_NAME = "Tetris-manifest"
-    GIT_USER_NAME = "Aj7Ay"
+    GIT_USER_NAME = "ajaydabe"
   }
     stage('Checkout Code') {
       steps {
-        git branch: 'main', url: 'https://github.com/Aj7Ay/Tetris-manifest.git'
+        git branch: 'version2', url: 'https://github.com/ajaydabe/tetris-deployment.git'
       }
     }
 
@@ -53,7 +55,7 @@ https://archive.eksworkshop.com/intermediate/290_argocd/install/
         script {
           withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
             // Determine the image name dynamically based on your versioning strategy
-            NEW_IMAGE_NAME = "sevenajay/tetris77:latest"
+            NEW_IMAGE_NAME = "ajaydabe/tetris:latest"
 
             // Replace the image name in the deployment.yaml file
             sh "sed -i 's|image: .*|image: $NEW_IMAGE_NAME|' deployment.yml"
@@ -61,7 +63,7 @@ https://archive.eksworkshop.com/intermediate/290_argocd/install/
             // Git commands to stage, commit, and push the changes
             sh 'git add deployment.yml'
             sh "git commit -m 'Update deployment image to $NEW_IMAGE_NAME'"
-            sh "git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main"
+            sh "git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:version2"
           }
         }
       }
