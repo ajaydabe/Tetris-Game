@@ -41,7 +41,7 @@ stage('OWASP FS Scan') {
 # Image updater stage
 ```
 environment {
-    GIT_REPO_NAME = "Tetris-manifest"
+    GIT_REPO_NAME = "tetris-deployment"
     GIT_USER_NAME = "ajaydabe"
 }
 stage('Checkout Code') {
