@@ -12,13 +12,8 @@ pipeline{
         }
         stage('checkout from Git'){
             steps{
-                git branch: 'main', url: 'https://github.com/Aj7Ay/TERRAFORM-JENKINS-CICD.git'
+                git branch: 'main', url: 'https://github.com/ajaydabe/Terraform-Jenkins-CICD.git'
             }
-        }
-        stage('Terraform version'){
-             steps{
-                 sh 'terraform --version'
-                }
         }
         stage("Sonarqube Analysis "){
             steps{
@@ -28,7 +23,7 @@ pipeline{
                 }
             }
         }
-        stage("quality gate"){
+        stage("Quality Gate"){
            steps {
                 script {
                     waitForQualityGate abortPipeline: false, credentialsId: 'Sonar-token' 
@@ -44,6 +39,11 @@ pipeline{
             steps{
                 sh 'chmod 777 website.sh'
             }
+        }
+        stage('Terraform version'){
+             steps{
+                 sh 'terraform --version'
+                }
         }
         stage('Terraform init'){
             steps{
