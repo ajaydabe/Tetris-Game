@@ -1,0 +1,75 @@
+pipeline{
+    agent any
+    tools{
+        jdk 'jdk17'
+        nodejs 'node16'
+        dotnetsdk '.net'
+    }
+    environment {
+        SCANNER_HOME=tool 'sonar-scanner'
+    }
+    stages {
+        stage('Clean Workspace'){
+            steps{
+                cleanWs()
+            }
+        }
+        stage('Checkout from Git'){
+            steps{
+                git branch: 'main', url: 'https://github.com/Aakibgithuber/Tetris-gamev1.git'
+            }
+        }
+        stage("Sonarqube Analysis "){
+            steps{
+                withSonarQubeEnv('sonar-server') {
+                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=TetrisVersion1.0 \
+                    -Dsonar.projectKey=TetrisVersion1.0 '''
+                }
+            }
+        }
+        stage("Quality Gate"){
+           steps {
+                script {
+                    waitForQualityGate abortPipeline: false, credentialsId: 'sonar-token' 
+                }
+            } 
+        }
+        stage('Install Dependencies') {
+            steps {
+                sh "npm install"
+            }
+        }
+        stage('OWASP FS Scan') {
+            steps {
+                withEnv(['JAVA_OPTS=-Xmx6g']) {
+                    dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
+                    dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+                }
+            }
+        }
+        stage('TRIVY FS Scan') {
+            steps {
+                sh "trivy fs . > trivyfs.txt"
+            }
+        }
+        stage("Docker Build Image"){
+            steps{
+                sh "docker build -t tetrisv1 ."
+                sh "docker tag tetrisv1 ajaydabe/tetrisv1:latest"
+            }
+        }
+        stage ('Docker Push Image') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                    sh 'docker login -u $USERNAME -p $PASSWORD'
+                    sh 'docker push ajaydabe/tetrisv1:latest'
+                }
+            }
+        }
+        stage("TRIVY Image Scan"){
+            steps{
+                sh "trivy image ajaydabe/tetrisv1:latest > trivyimage.txt" 
+            }
+        }
+    }
+}
