@@ -82,7 +82,7 @@ pipeline{
         stage('Update Deployment File') {
             steps {
                 script {
-                    withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
+                    withCredentials([string(credentialsId: 'github1', variable: 'GITHUB_TOKEN')]) {
                     // Determine the image name dynamically based on your versioning strategy
                     NEW_IMAGE_NAME = "ajaydabe/tetrisv1:latest"
 
