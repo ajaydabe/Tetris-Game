@@ -20,6 +20,12 @@ variable "bucket_name" {
   default     = "terraform-jenkins-cicd-bucket"
 }
 
+variable "dynamodb_table" {
+  description = "The name of the dynamodb table"
+  type        = string
+  default     = "terraform-jenkins-dynamo-db-table"
+}
+
 variable "acl" {
   description = "The ACL (Access Control List) for the S3 bucket"
   type        = string
