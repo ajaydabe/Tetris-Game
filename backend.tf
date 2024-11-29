@@ -1,8 +1,8 @@
 terraform {
   backend "s3" {
-    bucket         = var.bucket_name
+    bucket         = "jenkinscicd1996"
     key            = "JenkinsCICD/main"
-    region         = var.aws_region
-    dynamodb_table = var.dynamodb_table
+    region         = "ap-south-1"
+    dynamodb_table = "jenkinscicd_dynamodb_table"
   }
 }
