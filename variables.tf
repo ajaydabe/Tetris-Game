@@ -17,13 +17,13 @@ variable "ami_id" {
 variable "bucket_name" {
   description = "The name of the S3 bucket to create"
   type        = string
-  default     = "terraform-jenkins-cicd-bucket"
+  default     = "jenkinscicd1996"
 }
 
 variable "dynamodb_table" {
   description = "The name of the dynamodb table"
   type        = string
-  default     = "terraform-jenkins-dynamo-db-table"
+  default     = "jenkinscicd-dynamodb-table"
 }
 
 variable "acl" {
