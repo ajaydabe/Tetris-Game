@@ -9,7 +9,7 @@ pipeline{
         SCANNER_HOME=tool 'sonar-scanner'
         GIT_REPO_NAME = "Tetris-Game"
         GIT_USER_NAME = "ajaydabe"
-        TAG = V1
+        TAG = "V1"
     }
     stages {
         stage('Clean Workspace'){
