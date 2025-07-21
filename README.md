@@ -38,7 +38,7 @@ stage('OWASP FS Scan') {
 ## ARGO CD SETUP
     https://archive.eksworkshop.com/intermediate/290_argocd/install/
 
-## Image updater stage
+## Image Updater Stage
 ```
 environment {
     GIT_REPO_NAME = "Tetris-Game"
